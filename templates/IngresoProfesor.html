@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ingreso de profesores</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+
+<!-- Menú de navegación -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="{{ url_for('index')}}">Sistema Educativo</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('formulario')}}">Ingreso Alumno</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('formulario1')}}">IngresoProfesor</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#asignatura">IngresoCurso</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#profesor">IngresoMatricula</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('reporte') }}">Reporte</a>
+                </li>
+                
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Sección Profesor con formulario -->
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Registro de Profesor</h2>
+    <form action="/submit_form1" method="POST">
+        <div class="mb-3">
+            <label for="nif" class="form-label">NIF</label>
+            <input type="text" class="form-control" id="nif" name="nif" maxlength="45" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre</label>
+            <input type="text" class="form-control" id="nombre" name="nombre" maxlength="45" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="apellidos" class="form-label">Apellidos</label>
+            <input type="text" class="form-control" id="apellidos" name="apellidos" maxlength="45" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="telefono" class="form-label">Teléfono</label>
+            <input type="text" class="form-control" id="telefono" name="telefono" maxlength="45" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="direccion_postal" class="form-label">Dirección Postal</label>
+            <input type="text" class="form-control" id="direccion_postal" name="direccion_postal" maxlength="45" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="direccion_electronica" class="form-label">Dirección Electrónica</label>
+            <input type="email" class="form-control" id="direccion_electronica" name="direccion_electronica" maxlength="45" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="categoria" class="form-label">Categoría</label>
+            <input type="text" class="form-control" id="categoria" name="categoria" maxlength="45" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">Registrar Profesor</button>
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

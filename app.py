@@ -65,6 +65,38 @@ def reporte():
         print(f"Error al consultar los datos: {err}")
         return "Error al consultar los datos"
 
+@app.route('/formulario1')
+def formulario1():
+    return render_template('IngresoProfesor.html')
 
+@app.route('/submit_form1', methods=['POST'])
+def submit_form1():
+    nif = request.form.get('nif')
+    nombre = request.form.get('nombre')
+    apellidos = request.form.get('apellidos')
+    telefono = request.form.get('telefono')
+    direccion_postal = request.form.get('direccion_postal')   
+    direccion_electronica = request.form.get('direccion_electronica')
+    categoria = request.form.get('categoria')
+
+    # Crear cursor para ejecutar comandos SQL
+    cursor = db.cursor()
+    # Comando SQL para insertar datos en la tabla profesores
+    sql = """
+    INSERT INTO profesor (nif, nombre, apellidos, telefono, direccion_postal, direccion_electronica, categoria)
+    VALUES (%s, %s, %s, %s, %s, %s, %s)
+    """
+    valores = (nif, nombre, apellidos, telefono, direccion_postal, direccion_electronica, categoria)
+
+    try:
+        # Ejecutar el comando SQL e insertar datos
+        cursor.execute(sql, valores)
+        db.commit()  # Confirmar cambios en la base de datos
+        return redirect(url_for('formulario1'))
+    except mysql.connector.Error as err:
+        db.rollback()  # Revertir cambios en caso de error
+        return f"Error al guardar los datos: {err}"
+    finally:
+        cursor.close()  # Cerrar el cursor luego de la operación
 if __name__ == '__main__':
     app.run(debug=True)
