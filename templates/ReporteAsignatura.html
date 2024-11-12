@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menú de Navegación</title>
-    <!-- Bootstrap CSS -->
+    <title>Reportes</title>
+    <!-- Importamos Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
@@ -43,22 +42,42 @@
     </div>
 </nav>
 
-<!-- Sección de bienvenida -->
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8 text-center">
-            <h1 class="display-4">¡Bienvenido al Sistema Educativo!</h1>
-            <p class="lead mt-3">Gestiona cursos, alumnos, profesores, matrículas y más de manera eficiente y sencilla.</p>
-            <hr class="my-4">
-            <p class="mb-5">Este sistema está diseñado para facilitar la administración de toda la información educativa. Explora las funcionalidades del sistema a través del menú de navegación.</p>
-            <a class="btn btn-primary btn-lg" href="{{ url_for('formulario') }}" role="button">Comienza registro</a>
-        </div>
+
+    <div class="container my-5">
+        <h1 class="text-center mb-4">Reporte de Alumnos</h1>
+        
+        <table class="table table-bordered table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID Alumno</th>
+                    <th>Nombre</th>
+                    <th>Apellidos</th>
+                    <th>Dirección Postal</th>
+                    <th>Email</th>
+                    <th>Beca</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if alumnos %}
+                    {% for alumno in alumnos %}
+                    <tr>
+                        <td>{{ alumno.idalumno }}</td>  <!-- Corregido -->
+                        <td>{{ alumno.nombre }}</td>     <!-- Corregido -->
+                        <td>{{ alumno.apellidos }}</td>  <!-- Corregido -->
+                        <td>{{ alumno.direccion_postal }}</td> <!-- Corregido -->
+                        <td>{{ alumno.direccion_electronica }}</td> <!-- Corregido -->
+                        <td>{{ 'Sí' if alumno.tiene_beca else 'No' }}</td> <!-- Corregido -->
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center">No hay alumnos registrados.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
     </div>
-</div>
-
-<!-- Bootstrap JS y Popper.js -->
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
-
+    <!-- Importamos Bootstrap JS y sus dependencias -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

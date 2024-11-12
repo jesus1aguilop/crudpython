@@ -26,4 +26,10 @@ function validarDatos(event){
         showConfirmButton: false,
         timer: 1500
     });
+
+// Espera a que el alert termine y envía el formulario
+setTimeout(() => {
+    document.getElementById('form').submit(); // Reemplaza 'miFormulario' con el ID de tu formulario
+}, 1600); // Se espera un poco más de 1500 ms para asegurarse de que el alert termine
+
 }
