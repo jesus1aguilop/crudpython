@@ -1,0 +1,100 @@
+/* Update existing sidebar styles */
+.sidebar {
+    width: 260px;
+    height: 100vh;
+    background-color: #1a1d21;
+    color: #fff;
+    padding: 1rem;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: width 0.3s ease;
+    z-index: 1000;
+}
+
+.sidebar.collapsed {
+    width: 60px;
+}
+
+/* Add styles for the main content */
+.main-content {
+    margin-left: 260px;
+    transition: margin-left 0.3s ease;
+    width: calc(100% - 260px);
+}
+
+.main-content.expanded {
+    margin-left: 60px;
+    width: calc(100% - 60px);
+}
+
+/* Update profile styles */
+.profile span {
+    transition: opacity 0.3s ease;
+    white-space: nowrap;
+}
+
+.sidebar.collapsed .profile span {
+    opacity: 0;
+    display: none;
+}
+
+/* Add toggle button styles */
+.sidebar-toggle {
+    position: absolute;
+    top: 1rem;
+    right: -40px;
+    background: #1a1d21;
+    border: none;
+    color: white;
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 0 4px 4px 0;
+}
+
+/* Hide text in collapsed state */
+.sidebar.collapsed .nav-link span {
+    display: none;
+}
+
+.sidebar.collapsed .submenu {
+    padding-left: 0;
+}
+
+/* Adjust icon spacing in collapsed state */
+.sidebar.collapsed .nav-link i {
+    margin-right: 0;
+}
+
+/* Submenú desplegable */
+.submenu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out, visibility 0.3s;
+    padding-left: 20px;
+    visibility: hidden;
+}
+
+.submenu.active {
+    max-height: 1000px; /* Un valor alto para permitir el despliegue completo */
+    visibility: visible;
+}
+
+/* Estilo para el encabezado del menú con flecha */
+.menu-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+}
+
+.arrow {
+    transition: transform 0.3s;
+}
+
+.menu-header.active .arrow {
+    transform: rotate(180deg);
+}
