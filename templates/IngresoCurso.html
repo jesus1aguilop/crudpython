@@ -1,115 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menú de Navegación</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/style.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-</head>
-<body>
-    <!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#">
-            <img src="#" alt="Profile" width="30" height="30" class="d-inline-block align-text-top">
-            Sistema Educativo
-        </a>
-        
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        
-        <div class="collapse navbar-collapse" id="navbarNavDropdown">
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('index')}}">
-                        <i class="fas fa-home"></i> Dashboard
-                    </a>
-                </li>
-                
-                <!-- Dropdown Ingresos -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                        <i class="fas fa-file-import"></i> Ingresos
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a class="dropdown-item" href="{{ url_for('formulario') }}">
-                                <i class="fas fa-user-graduate"></i> Ingreso Alumno
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="{{ url_for('formulario1') }}">
-                                <i class="fas fa-chalkboard-teacher"></i> Ingreso Profesor
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="{{ url_for('formulario2') }}">
-                                <i class="fas fa-book"></i> Ingreso Curso
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-                
-                <!-- Dropdown Reportes -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                        <i class="fas fa-chart-bar"></i> Reportes
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a class="dropdown-item" href="{{ url_for('reporte') }}">
-                                <i class="fas fa-user-graduate"></i> Reporte de Alumno
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="{{ url_for('reporteProfesor')}}">
-                                <i class="fas fa-chalkboard-teacher"></i> Reporte de Profesor
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="{{ url_for('reporteCurso')}}">
-                                <i class="fas fa-book"></i> Reporte de Curso
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="{{ url_for('reporteAsignatura')}}">
-                                <i class="fas fa-book-open"></i> Reporte de Asignatura
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
+{% block title %}Formulario de Curso{% endblock %}
 
-<!--Formulario del curso-->
-<section id="alumno" class="container mt-5">
-    <h2>Formulario de curso</h2>
+{% block content %}
+<section id="curso" class="container mt-5">
+    <h2>Formulario de Curso</h2>
     <form action="/submit_form2" method="POST" id="form">
         <div class="row mb-3">
             <div class="col-md-6">
                 <label for="nombre" class="form-label">Nombre</label>
-                <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Introduce el nombre">
+                <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Introduce el nombre" required>
             </div>
         </div>
         <div class="row mb-3">
             <div class="col-md-6">
-                <label for="apellido1" class="form-label">Numero de asignaturas</label>
-                <input type="text" class="form-control" id="numero_asignaturas" name="numero_asignaturas" placeholder="Introduce el primer apellido">
+                <label for="numero_asignaturas" class="form-label">Número de Asignaturas</label>
+                <input type="number" class="form-control" id="numero_asignaturas" name="numero_asignaturas" placeholder="Introduce el número de asignaturas" required>
             </div>
         </div>
-        <button type="submit" class="btn btn-primary" onclick="validarDatos(event)">Guardar</button>
+        <button type="submit" class="btn btn-primary">Guardar</button>
     </form>
 </section>
-
-
-    <script src="/static/js/alerts.js"></script>
-</body>
-
-</html>
+{% endblock %}

@@ -1,0 +1,45 @@
+{%extends "base.html" %}
+
+{% block title %}
+editar Asignatura
+{% endblock %}
+
+{% block content %}
+<!-- Sección Asignatura con formulario de edición -->
+    <section id="alumno" class="container mt-5">
+        <div class="container mt-5">
+            <h2 class="text-center mb-4">Editar Asignatura</h2>
+            <form action="/update_asignatura/{{ asignatura.idasignatura }}" method="POST" id="form">
+                <div class="mb-3">
+                    <label for="idasignatura" class="form-label">ID Asignatura</label>
+                    <input type="number" class="form-control" id="idasignatura" name="idasignatura" value="{{ asignatura.idasignatura }}" readonly required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="nombre" class="form-label">Nombre</label>
+                    <input type="text" class="form-control" id="nombre" name="nombre" value="{{ asignatura.nombre }}" maxlength="45" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="creditos" class="form-label">Créditos</label>
+                    <input type="number" class="form-control" id="creditos" name="creditos" value="{{ asignatura.creditos }}" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="cuatrimestre" class="form-label">Cuatrimestre</label>
+                    <input type="number" class="form-control" id="cuatrimestre" name="cuatrimestre" value="{{ asignatura.cuatrimestre }}" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="caracter" class="form-label">Carácter</label>
+                    <select class="form-control" id="caracter" name="caracter" required>
+                        <option value="obligatoria" {% if asignatura.caracter == 'obligatoria' %}selected{% endif %}>Obligatoria</option>
+                        <option value="optativa" {% if asignatura.caracter == 'optativa' %}selected{% endif %}>Optativa</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">Actualizar Asignatura</button>
+            </form>
+        </div>
+    </section>
+{% endblock %}

@@ -65,8 +65,7 @@ def reporte():
     except mysql.connector.Error as err:
         print(f"Error al consultar los datos: {err}")
         return "Error al consultar los datos"
-    
-    #Update el registro
+
 # Mostrar formulario de edición de alumno
 @app.route('/editar_alumno/<int:idalumno>', methods=['GET', 'POST'])
 def editar_alumno(idalumno):
@@ -94,14 +93,22 @@ def editar_alumno(idalumno):
         except mysql.connector.Error as err:
             db.rollback()
             return f"Error al actualizar el alumno: {err}"
+        finally:
+            cursor.close()  # Asegúrate de cerrar el cursor aquí
+
     else:
         # Obtener datos del alumno para mostrarlos en el formulario
         cursor.execute("SELECT * FROM alumnos WHERE idalumno = %s", (idalumno,))
         alumno = cursor.fetchone()
         cursor.close()
+        
+        if alumno is None:
+            print('Alumno no encontrado', 'error')
+            return redirect(url_for('reporte'))  # Redirigir si el alumno no existe
+        
         return render_template('editarAlumno.html', alumno=alumno)
-    
-#Delete Alumno
+
+
 # Función para eliminar un alumno
 @app.route('/eliminar_alumno/<int:idalumno>', methods=['POST'])
 def eliminar_alumno(idalumno):
@@ -114,15 +121,14 @@ def eliminar_alumno(idalumno):
         db.rollback()
         return f"Error al eliminar el alumno: {err}"
     finally:
-        cursor.close()
-        
+        cursor.close()  # Siempre cierra el cursor aquí también
         
 # endpoint del formulario de Profesor
 @app.route('/formulario1')
 def formulario1():
     return render_template('IngresoProfesor.html')
 
-#funcion que recibe los datos del formulario de Profesor
+# Función que recibe los datos del formulario de Profesor
 @app.route('/submit_form1', methods=['POST'])
 def submit_form1():
     nif = request.form.get('nif')
@@ -135,7 +141,7 @@ def submit_form1():
 
     # Crear cursor para ejecutar comandos SQL
     cursor = db.cursor()
-    # Comando SQL para insertar datos en la tabla profesores
+    # Comando SQL para insertar datos en la tabla 'profesor'
     sql = """
     INSERT INTO profesor (nif, nombre, apellidos, telefono, direccion_postal, direccion_electronica, categoria)
     VALUES (%s, %s, %s, %s, %s, %s, %s)
@@ -162,12 +168,69 @@ def reporteProfesor():
         profesores = cursor.fetchall()  # Obtener todos los registros de profesores
         cursor.close()
         
-        # Pasamos los registros de profesores a la plantilla 'reportProfesor.html'
+        # Pasamos los registros de profesores a la plantilla 'reporteProfesor.html'
         return render_template('reporteProfesor.html', profesores=profesores)
     except mysql.connector.Error as err:
         print(f"Error al consultar los datos: {err}")
         return "Error al consultar los datos"
 
+@app.route('/eliminar_profesor/<int:idprofesor>', methods=["POST"])
+def eliminar_profesor(idprofesor):
+    try: 
+        cursor = db.cursor()
+        cursor.execute("DELETE FROM profesor WHERE idprofesor = %s", (idprofesor,))  # Cambiado a la tabla 'profesor'
+        db.commit()
+        return redirect(url_for('reporteProfesor'))  # Corregido la ruta de redirección
+    except mysql.connector.Error as err:
+        db.rollback()
+        return f"Error al eliminar el profesor: {err}"
+    finally:
+        cursor.close()
+
+# Función para editar profesor
+@app.route('/editar_profesor/<int:idprofesor>', methods=['GET', 'POST'])
+def editar_profesor(idprofesor):
+    if request.method == 'POST':
+        nif = request.form.get('nif')
+        nombre = request.form.get('nombre')
+        apellidos = request.form.get('apellidos')
+        telefono = request.form.get('telefono')
+        direccion_postal = request.form.get('direccion_postal')   
+        direccion_electronica = request.form.get('direccion_electronica')
+        categoria = request.form.get('categoria')
+        
+        try:
+            cursor = db.cursor()
+            cursor.execute("""
+                UPDATE profesor
+                SET nif = %s, nombre = %s, apellidos = %s, telefono = %s, direccion_postal = %s, direccion_electronica = %s, categoria = %s
+                WHERE idprofesor = %s
+            """, (nif, nombre, apellidos, telefono, direccion_postal, direccion_electronica, categoria, idprofesor))
+            
+            db.commit()
+            print("Profesor actualizado con éxito", "success")
+            return redirect(url_for('reporteProfesor'))
+        
+        except mysql.connector.Error as err: 
+            db.rollback()
+            print(f"Error al editar el profesor: {err}", "error")
+            return redirect(url_for('editar_profesor', idprofesor=idprofesor))
+        
+        finally:
+            cursor.close()
+    
+    else:
+        cursor = db.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM profesor WHERE idprofesor = %s", (idprofesor,))  # Cambiado a la tabla 'profesor'
+        profesor = cursor.fetchone()
+        cursor.close()
+        
+        if profesor is None:
+            print("Profesor no encontrado", "error")
+            return redirect(url_for('reporteProfesor'))
+        
+        return render_template('editarProfesor.html', profesor=profesor)
+    
 @app.route('/formulario2')
 def formulario2():
     return render_template('IngresoCurso.html')
@@ -206,11 +269,58 @@ def reporteCurso():
         cursos = cursor.fetchall()  # Obtener todos los registros de profesores
         cursor.close()
         
-        # Pasamos los registros de profesores a la plantilla 'reportProfesor.html'
-        return render_template('reporteCurso.html', cursos=cursos)
+        # Pasamos los registros de profesores a la plantilla 
+        return render_template('reportCurso.html', cursos=cursos)
     except mysql.connector.Error as err:
         print(f"Error al consultar los datos: {err}")
         return "Error al consultar los datos"
+    
+# Endpoint de eliminación de curso
+@app.route('/eliminar_curso/<int:idcurso>', methods=["POST"])
+def eliminar_curso(idcurso):
+    try:
+        cursor = db.cursor()
+        cursor.execute("DELETE FROM cursos WHERE idcurso = %s", (idcurso,))  # Corregir el paso de la tupla
+        db.commit()
+        return redirect(url_for('reporteCurso'))
+    except mysql.connector.Error as err:
+        db.rollback()
+        return f"Error al eliminar el curso: {err}"
+    finally:
+        cursor.close()
+
+# Función de edición de curso
+@app.route('/editar_curso/<int:idcurso>', methods=['GET', 'POST'])
+def editar_curso(idcurso):
+    if request.method == 'POST':
+        nombre = request.form.get('nombre')
+        numero_asignaturas = request.form.get('numero_asignaturas')
+    
+        try:
+            cursor = db.cursor()
+            cursor.execute("""
+                UPDATE cursos
+                SET nombre = %s, numero_asignaturas = %s  # Corregir el nombre de la columna
+                WHERE idcurso = %s
+            """, (nombre, numero_asignaturas, idcurso))
+            db.commit()
+            return redirect(url_for('reporteCurso'))
+        except mysql.connector.Error as err:
+            db.rollback()
+            return f"Error al editar el curso: {err}"
+        finally:
+            cursor.close()
+    else:
+        cursor = db.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM cursos WHERE idcurso = %s", (idcurso,))
+        curso = cursor.fetchone()  # Cambié aquí 'curso' por 'cursor'
+        cursor.close()
+        
+        if curso is None:
+            print('Curso no encontrado', 'error')
+            return redirect(url_for('reporteCurso'))  # Redirigir si el curso no existe
+        
+        return render_template('editarCurso.html', curso=curso)
 
 @app.route('/formulario3')
 def formulario3():
@@ -259,6 +369,60 @@ def reporteAsignatura():
         print(f"Error al consultar los datos: {err}")
         return "Error al consultar los datos"
     
+    # Ruta para editar asignatura
+@app.route('/editar_asignatura/<int:idasignatura>', methods=['GET', 'POST'])
+def editar_asignatura(idasignatura):
+    cursor = db.cursor(dictionary=True)
+    if request.method == 'POST':
+        # Obtener datos del formulario
+        nombre = request.form.get('nombre')
+        creditos = request.form.get('creditos')
+        cuatrimestre = request.form.get('cuatrimestre')
+        caracter = request.form.get('caracter')
+
+        # Actualizar datos en la base de datos
+        sql = """
+        UPDATE asignatura
+        SET nombre = %s, creditos = %s, cuatrimestre = %s, caracter = %s
+        WHERE idasignatura = %s
+        """
+        valores = (nombre, creditos, cuatrimestre, caracter, idasignatura)
+        
+        try:
+            cursor.execute(sql, valores)
+            db.commit()
+            return redirect(url_for('reporteAsignatura'))
+        except mysql.connector.Error as err:
+            db.rollback()
+            return f"Error al actualizar la asignatura: {err}"
+        finally:
+            cursor.close()  # Cerrar cursor
+
+    else:
+        # Obtener datos de la asignatura para mostrarlos en el formulario
+        cursor.execute("SELECT * FROM asignatura WHERE idasignatura = %s", (idasignatura,))
+        asignatura = cursor.fetchone()
+        cursor.close()
+        
+        if asignatura is None:
+            print('Asignatura no encontrada', 'error')
+            return redirect(url_for('reporteAsignatura'))  # Redirigir si la asignatura no existe
+        
+        return render_template('editarAsignatura.html', asignatura=asignatura)
+
+# Ruta para eliminar asignatura
+@app.route('/eliminar_asignatura/<int:idasignatura>', methods=['POST'])
+def eliminar_asignatura(idasignatura):
+    try:
+        cursor = db.cursor()
+        cursor.execute("DELETE FROM asignatura WHERE idasignatura = %s", (idasignatura,))
+        db.commit()
+        return redirect(url_for('reporteAsignatura'))
+    except mysql.connector.Error as err:
+        db.rollback()
+        return f"Error al eliminar la asignatura: {err}"
+    finally:
+        cursor.close()
 
 if __name__ == '__main__':
     app.run(debug=True)

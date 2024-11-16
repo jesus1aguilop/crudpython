@@ -1,138 +1,50 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reportes</title>
-    <!-- Importamos Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-</head>
-<body>
+{% extends "base.html" %}
 
-    <!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#">
-            <img src="#" alt="Profile" width="30" height="30" class="d-inline-block align-text-top">
-            Sistema Educativo
-        </a>
-        
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        
-        <div class="collapse navbar-collapse" id="navbarNavDropdown">
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('index')}}">
-                        <i class="fas fa-home"></i> Dashboard
-                    </a>
-                </li>
-                
-                <!-- Dropdown Ingresos -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                        <i class="fas fa-file-import"></i> Ingresos
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a class="dropdown-item" href="{{ url_for('formulario') }}">
-                                <i class="fas fa-user-graduate"></i> Ingreso Alumno
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="{{ url_for('formulario1') }}">
-                                <i class="fas fa-chalkboard-teacher"></i> Ingreso Profesor
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="{{ url_for('formulario2') }}">
-                                <i class="fas fa-book"></i> Ingreso Curso
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-                
-                <!-- Dropdown Reportes -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                        <i class="fas fa-chart-bar"></i> Reportes
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a class="dropdown-item" href="{{ url_for('reporte') }}">
-                                <i class="fas fa-user-graduate"></i> Reporte de Alumno
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="{{ url_for('reporteProfesor')}}">
-                                <i class="fas fa-chalkboard-teacher"></i> Reporte de Profesor
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="{{ url_for('reporteCurso')}}">
-                                <i class="fas fa-book"></i> Reporte de Curso
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="{{ url_for('reporteAsignatura')}}">
-                                <i class="fas fa-book-open"></i> Reporte de Asignatura
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
+{% block title %}Reporte de Alumnos{% endblock %}
 
-    <div class="container my-5">
-        <h1 class="text-center mb-4">Reporte de Alumnos</h1>
-        
-        <table class="table table-bordered table-striped table-hover">
-            <thead class="table-dark">
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center mb-4">Reporte de Alumnos</h1>
+    
+    <table class="table table-bordered table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>ID Alumno</th>
+                <th>Nombre</th>
+                <th>Apellidos</th>
+                <th>Dirección Postal</th>
+                <th>Email</th>
+                <th>Beca</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if alumnos %}
+                {% for alumno in alumnos %}
                 <tr>
-                    <th>ID Alumno</th>
-                    <th>Nombre</th>
-                    <th>Apellidos</th>
-                    <th>Dirección Postal</th>
-                    <th>Email</th>
-                    <th>Beca</th>
+                    <td>{{ alumno.idalumno }}</td>
+                    <td>{{ alumno.nombre }}</td>
+                    <td>{{ alumno.apellidos }}</td>
+                    <td>{{ alumno.direccion_postal }}</td>
+                    <td>{{ alumno.direccion_electronica }}</td>
+                    <td>{{ 'Sí' if alumno.tiene_beca else 'No' }}</td>
+                    <td>
+                        <!-- Botón Editar -->
+                        <a href="{{ url_for('editar_alumno', idalumno=alumno.idalumno) }}" class="btn btn-warning btn-sm">Editar</a>
+                        
+                        <!-- Botón Eliminar -->
+                        <form action="{{ url_for('eliminar_alumno', idalumno=alumno.idalumno) }}" method="post" style="display:inline;">
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar este alumno?')">Eliminar</button>
+                        </form>
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
-                {% if alumnos %}
-                    {% for alumno in alumnos %}
-                    <tr>
-                        <td>{{ alumno.idalumno }}</td>
-                        <td>{{ alumno.nombre }}</td>
-                        <td>{{ alumno.apellidos }}</td>
-                        <td>{{ alumno.direccion_postal }}</td>
-                        <td>{{ alumno.direccion_electronica }}</td>
-                        <td>{{ 'Sí' if alumno.tiene_beca else 'No' }}</td>
-                        <td>
-                            <!-- Botón Editar -->
-                            <a href="{{ url_for('editar_alumno', idalumno=alumno.idalumno) }}" class="btn btn-warning btn-sm">Editar</a>
-                            
-                            <!-- Botón Eliminar -->
-                            <form action="{{ url_for('eliminar_alumno', idalumno=alumno.idalumno) }}" method="post" style="display:inline;">
-                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar este alumno?')">Eliminar</button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                {% else %}
-                    <tr>
-                        <td colspan="7" class="text-center">No hay alumnos registrados.</td>
-                    </tr>
-                {% endif %}
-            </tbody>
-            
-        </table>
-    </div> 
-
-    <!-- Importamos Bootstrap JS y sus dependencias -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="7" class="text-center">No hay alumnos registrados.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
