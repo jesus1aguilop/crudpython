@@ -298,9 +298,9 @@ def editar_curso(idcurso):
     
         try:
             cursor = db.cursor()
-            cursor.execute("""
-                UPDATE cursos
-                SET nombre = %s, numero_asignaturas = %s  # Corregir el nombre de la columna
+            cursor.execute("""  # Ensure the table name is correct
+                UPDATE curso  # Changed from 'cursos' to 'curso'
+                SET nombre = %s, numero_asignaturas = %s
                 WHERE idcurso = %s
             """, (nombre, numero_asignaturas, idcurso))
             db.commit()
@@ -312,13 +312,13 @@ def editar_curso(idcurso):
             cursor.close()
     else:
         cursor = db.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM cursos WHERE idcurso = %s", (idcurso,))
-        curso = cursor.fetchone()  # Cambié aquí 'curso' por 'cursor'
+        cursor.execute("SELECT * FROM curso WHERE idcurso = %s", (idcurso,))
+        curso = cursor.fetchone()  
         cursor.close()
         
         if curso is None:
             print('Curso no encontrado', 'error')
-            return redirect(url_for('reporteCurso'))  # Redirigir si el curso no existe
+            return redirect(url_for('reporteCurso'))  
         
         return render_template('editarCurso.html', curso=curso)
 
@@ -423,6 +423,145 @@ def eliminar_asignatura(idasignatura):
         return f"Error al eliminar la asignatura: {err}"
     finally:
         cursor.close()
+        
+# Ruta para mostrar el formulario de matrícula
+@app.route('/matriculas', methods=['GET'])
+def matriculas():
+    try:
+        cursor = db.cursor(dictionary=True)
+
+        # Consultar estudiantes
+        cursor.execute("SELECT idalumno, nombre, apellidos FROM alumnos")
+        alumnos = cursor.fetchall()
+
+        # Consultar asignaturas
+        cursor.execute("SELECT idasignatura, nombre FROM asignatura")
+        asignaturas = cursor.fetchall()
+
+        cursor.close()
+        return render_template('ingresomatricula.html', alumnos=alumnos, asignaturas=asignaturas)
+    except mysql.connector.Error as err:
+        print(f"Error al cargar datos: {err}")
+        return "Error al cargar datos para matrícula"
+
+# Ruta para registrar una nueva matrícula
+@app.route('/registrar_matricula', methods=['POST'])
+def registrar_matricula():
+    try:
+        idalumno = request.form.get('idalumno')
+        idasignatura = request.form.get('idasignatura')
+
+        if not idalumno or not idasignatura:
+            return "Debe seleccionar un alumno y una asignatura"
+
+        cursor = db.cursor()
+        consulta = "INSERT INTO matricula (idalumno, idasignatura) VALUES (%s, %s)"
+        cursor.execute(consulta, (idalumno, idasignatura))
+        db.commit()
+        cursor.close()
+
+        return redirect(url_for('reporte_matriculas'))
+    except mysql.connector.Error as err:
+        db.rollback()
+        print(f"Error al registrar matrícula: {err}")
+        return f"Error al registrar matrícula: {err}"
+
+# Ruta para listar matrículas
+@app.route('/reporte_matriculas')
+def reporte_matriculas():
+    try:
+        cursor = db.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT m.idmatricula, 
+                   a.nombre AS alumno_nombre, 
+                   a.apellidos AS alumno_apellidos,
+                   asig.nombre AS asignatura_nombre
+            FROM matricula m
+            JOIN alumnos a ON m.idalumno = a.idalumno
+            JOIN asignatura asig ON m.idasignatura = asig.idasignatura
+        """)
+        matriculas = cursor.fetchall()
+        cursor.close()
+
+        return render_template('reportematricula.html', matriculas=matriculas)
+    except mysql.connector.Error as err:
+        print(f"Error al consultar matrículas: {err}")
+        return "Error al consultar matrículas"
+
+# Ruta para eliminar matrícula
+@app.route('/eliminar_matricula/<int:idmatricula>', methods=['POST'])
+def eliminar_matricula(idmatricula):
+    try:
+        cursor = db.cursor()
+        cursor.execute("DELETE FROM matricula WHERE idmatricula = %s", (idmatricula,))
+        db.commit()
+        cursor.close()
+
+        return redirect(url_for('reporte_matriculas'))
+    except mysql.connector.Error as err:
+        db.rollback()
+        print(f"Error al eliminar matrícula: {err}")
+        return f"Error al eliminar matrícula: {err}"
+
+# Ruta para editar matrícula
+@app.route('/editar_matricula/<int:idmatricula>', methods=['GET', 'POST'])
+def editar_matricula(idmatricula):
+    try:
+        cursor = db.cursor(dictionary=True)
+
+        if request.method == 'GET':
+            # Consultar los detalles de la matrícula
+            cursor.execute("""
+                SELECT idmatricula, idalumno, idasignatura 
+                FROM matricula 
+                WHERE idmatricula = %s
+            """, (idmatricula,))
+            matricula = cursor.fetchone()
+
+            # Consultar alumnos y asignaturas
+            cursor.execute("SELECT idalumno, nombre, apellidos FROM alumnos")
+            alumnos = cursor.fetchall()
+
+            cursor.execute("SELECT idasignatura, nombre FROM asignatura")
+            asignaturas = cursor.fetchall()
+
+            cursor.close()
+            return render_template('editarmatricula.html', matricula=matricula, alumnos=alumnos, asignaturas=asignaturas)
+
+        elif request.method == 'POST':
+            idalumno = request.form.get('idalumno')
+            idasignatura = request.form.get('idasignatura')
+
+            try:
+                # Validar que los datos existan
+                cursor.execute("SELECT COUNT(*) AS count FROM alumnos WHERE idalumno = %s", (idalumno,))
+                if cursor.fetchone()['count'] == 0:
+                    raise ValueError("El alumno seleccionado no existe.")
+
+                cursor.execute("SELECT COUNT(*) AS count FROM asignatura WHERE idasignatura = %s", (idasignatura,))
+                if cursor.fetchone()['count'] == 0:
+                    raise ValueError("La asignatura seleccionada no existe.")
+
+                # Actualizar matrícula
+                consulta = """
+                UPDATE matricula 
+                SET idalumno = %s, idasignatura = %s 
+                WHERE idmatricula = %s
+                """
+                cursor.execute(consulta, (idalumno, idasignatura, idmatricula))
+                db.commit()
+                cursor.close()
+
+                return redirect(url_for('reporte_matriculas'))
+            except Exception as e:
+                db.rollback()
+                print(f"Error al editar matrícula: {e}")
+                return f"Error al editar matrícula: {e}"
+
+    except Exception as e:
+        print(f"Error en la consulta inicial: {e}")
+        return f"Error en la consulta inicial: {e}"
+
 
 if __name__ == '__main__':
     app.run(debug=True)

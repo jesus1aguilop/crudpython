@@ -5,7 +5,7 @@
 {% block content %}
 <section id="alumno" class="container mt-5">
     <h2>Editar Curso</h2>
-    <form action="/submit_form2" method="POST" id="form">
+    <form action="{{ url_for('editar_curso', idcurso=curso.idcurso) }}" method="POST" id="form">
         <div class="row mb-3">
             <div class="col-md-6">
                 <label for="nombre" class="form-label">Nombre</label>
