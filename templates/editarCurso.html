@@ -15,10 +15,10 @@
         <div class="row mb-3">
             <div class="col-md-6">
                 <label for="numero_asignaturas" class="form-label">Número de Asignaturas</label>
-                <input type="text" class="form-control" id="numero_asignaturas" name="numero_asignaturas" placeholder="Introduce el número" value="{{ curso.numero_asignaturas }}" required>
+                <input type="number" class="form-control" id="numero_asignaturas" name="numero_asignaturas" placeholder="Introduce el número" value="{{ curso.numero_asignaturas }}" required>
             </div>
         </div>
-        <button type="submit" class="btn btn-primary" onclick="validarDatos(event)">Guardar cambios</button>
+        <button type="submit" class="btn btn-primary">Guardar cambios</button>
     </form>
 </section>
 {% endblock %}

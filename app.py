@@ -1,7 +1,9 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session 
 import mysql.connector
+# import psycopg2
 
 app = Flask(__name__)
+app.secret_key = 'clave_secreta'
 
 # Configuración de la conexión a la base de datos
 db = mysql.connector.connect(
@@ -299,7 +301,7 @@ def editar_curso(idcurso):
         try:
             cursor = db.cursor()
             cursor.execute("""  # Ensure the table name is correct
-                UPDATE curso  # Changed from 'cursos' to 'curso'
+                UPDATE curso  
                 SET nombre = %s, numero_asignaturas = %s
                 WHERE idcurso = %s
             """, (nombre, numero_asignaturas, idcurso))
