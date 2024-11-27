@@ -1,24 +1,105 @@
-from flask import Flask, render_template, request, redirect, url_for, session 
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 import mysql.connector
-# import psycopg2
+from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
+from functools import wraps
 
 app = Flask(__name__)
-app.secret_key = 'clave_secreta'
+app.secret_key = 'clave_secreta_segura'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@localhost/universidad_2'
+db = SQLAlchemy(app)
 
 # Configuración de la conexión a la base de datos
-db = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="",
-    database="universidad_2"
-)
+#db = mysql.connector.connect(
+#    host="localhost",
+#    user="root",
+#    password="",
+#   database="universidad_2"
+#)
+
+# Modelo de Usuario
+class User(db.Model):
+    __tablename__ = 'users'
+    idusuario = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50), unique=True, nullable=False)
+    password = db.Column(db.String(255), nullable=False)
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            flash('Debe iniciar sesión para acceder a esta página.', 'warning')
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+# ---------------------------
+# Funciones de Login y Registro
+# ---------------------------
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        
+        # Verificar usuario en la base de datos
+        user = User.query.filter_by(username=username).first()
+        if user and check_password_hash(user.password, password):
+            session['user_id'] = user.idusuario
+            session['user_name'] = user.username
+            flash('Inicio de sesión exitoso.', 'success')
+            return redirect(url_for('index'))
+        else:
+            flash('Usuario o contraseña incorrectos.', 'danger')
+            return redirect(url_for('login'))
+    return render_template('login.html')
+
+
+
+# Ruta para el registro
+@app.route('/registro', methods=['GET', 'POST'])
+def registro():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        hashed_password = generate_password_hash(password)
+
+        # Verificar si el usuario ya existe
+        if User.query.filter_by(username=username).first():
+            flash('El usuario ya existe.', 'danger')
+            return redirect(url_for('registro'))
+
+        # Guardar usuario en la base de datos
+        new_user = User(username=username, password=hashed_password)
+        db.session.add(new_user)
+        db.session.commit()
+        flash('Usuario registrado exitosamente.', 'success')
+        return redirect(url_for('login'))
+    return render_template('registro.html')
+
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash('Sesión cerrada exitosamente', 'success')
+    return redirect(url_for('login'))
+
+# ---------------------------
+# Código existente (resumido)
+# ---------------------------
 
 @app.route('/')
+@login_required
 def index():
-    return render_template('index.html')  # Carga el archivo HTML con el formulario
+    if 'user_id' in session:
+        return render_template('index.html', user_name=session['user_name'])
+    flash('Por favor, inicia sesión primero', 'error')
+    return redirect(url_for('login'))
 
 # endpoint del formulario de Alumno
 @app.route('/formulario')
+@login_required
 def formulario():
     return render_template('ingresoAlumno.html')
 
@@ -55,6 +136,7 @@ def submit_form():
 
 # Esta es la función que consulta y muestra los registros
 @app.route('/reporte')
+@login_required
 def reporte():
     try:
         cursor = db.cursor(dictionary=True)  # Usamos un cursor en modo diccionario para facilidad
@@ -127,6 +209,7 @@ def eliminar_alumno(idalumno):
         
 # endpoint del formulario de Profesor
 @app.route('/formulario1')
+@login_required
 def formulario1():
     return render_template('IngresoProfesor.html')
 
@@ -163,6 +246,7 @@ def submit_form1():
 
 # Esta es la función que consulta y muestra los registros para el reporte de profesores
 @app.route('/reporteProfesor')
+@login_required
 def reporteProfesor():
     try:
         cursor = db.cursor(dictionary=True)  # Usamos un cursor en modo diccionario para facilidad
@@ -234,6 +318,7 @@ def editar_profesor(idprofesor):
         return render_template('editarProfesor.html', profesor=profesor)
     
 @app.route('/formulario2')
+@login_required
 def formulario2():
     return render_template('IngresoCurso.html')
 
@@ -264,6 +349,7 @@ def submit_form2():
         cursor.close()  # Cerrar el cursor después de la operación
 
 @app.route('/reporteCurso')
+@login_required
 def reporteCurso():
     try:
         cursor = db.cursor(dictionary=True)  # Usamos un cursor en modo diccionario para facilidad
@@ -325,6 +411,7 @@ def editar_curso(idcurso):
         return render_template('editarCurso.html', curso=curso)
 
 @app.route('/formulario3')
+@login_required
 def formulario3():
     return render_template('IngresoAsignatura.html')
     
@@ -358,6 +445,7 @@ def submit_form3():
         cursor.close()  # Cerrar el cursor después de la operación
 
 @app.route('/reporteAsignatura')
+@login_required
 def reporteAsignatura():
     try:
         cursor = db.cursor(dictionary=True)  # Usamos un cursor en modo diccionario para
@@ -428,6 +516,7 @@ def eliminar_asignatura(idasignatura):
         
 # Ruta para mostrar el formulario de matrícula
 @app.route('/matriculas', methods=['GET'])
+@login_required
 def matriculas():
     try:
         cursor = db.cursor(dictionary=True)
@@ -470,6 +559,7 @@ def registrar_matricula():
 
 # Ruta para listar matrículas
 @app.route('/reporte_matriculas')
+@login_required
 def reporte_matriculas():
     try:
         cursor = db.cursor(dictionary=True)
