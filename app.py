@@ -69,7 +69,7 @@ def registro():
         if User.query.filter_by(username=username).first():
             flash('El usuario ya existe.', 'danger')
             return redirect(url_for('registro'))
-
+        
         # Guardar usuario en la base de datos
         new_user = User(username=username, password=hashed_password)
         db.session.add(new_user)
