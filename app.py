@@ -1,29 +1,20 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 import mysql.connector
-from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 
 app = Flask(__name__)
 app.secret_key = 'clave_secreta_segura'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@localhost/universidad_2'
-db = SQLAlchemy(app)
 
 # Configuración de la conexión a la base de datos
-#db = mysql.connector.connect(
-#    host="localhost",
-#    user="root",
-#    password="",
-#   database="universidad_2"
-#)
+db = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    password="",
+    database="universidad_2"
+)
 
-# Modelo de Usuario
-class User(db.Model):
-    __tablename__ = 'users'
-    idusuario = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(50), unique=True, nullable=False)
-    password = db.Column(db.String(255), nullable=False)
-
+# Función para verificar si el usuario está logueado (decorador)
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -42,20 +33,30 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        
-        # Verificar usuario en la base de datos
-        user = User.query.filter_by(username=username).first()
-        if user and check_password_hash(user.password, password):
-            session['user_id'] = user.idusuario
-            session['user_name'] = user.username
-            flash('Inicio de sesión exitoso.', 'success')
-            return redirect(url_for('index'))
-        else:
-            flash('Usuario o contraseña incorrectos.', 'danger')
+
+        try:
+            cursor = db.cursor(dictionary=True)
+
+            # Verificar si el usuario existe en la base de datos
+            cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
+            user = cursor.fetchone()
+
+            cursor.close()
+
+            if user and check_password_hash(user['password'], password):
+                session['user_id'] = user['idusuario']
+                session['user_name'] = user['username']
+                flash('Inicio de sesión exitoso.', 'success')
+                return redirect(url_for('index'))
+            else:
+                flash('Usuario o contraseña incorrectos.', 'danger')
+                return redirect(url_for('login'))
+        except mysql.connector.Error as err:
+            print(f"Error al consultar la base de datos: {err}")
+            flash('Error en la base de datos.', 'danger')
             return redirect(url_for('login'))
+    
     return render_template('login.html')
-
-
 
 # Ruta para el registro
 @app.route('/registro', methods=['GET', 'POST'])
@@ -65,18 +66,33 @@ def registro():
         password = request.form['password']
         hashed_password = generate_password_hash(password)
 
-        # Verificar si el usuario ya existe
-        if User.query.filter_by(username=username).first():
-            flash('El usuario ya existe.', 'danger')
+        try:
+            cursor = db.cursor()
+
+            # Verificar si el usuario ya existe
+            cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
+            existing_user = cursor.fetchone()
+
+            if existing_user:
+                flash('El usuario ya existe.', 'danger')
+                cursor.close()
+                return redirect(url_for('registro'))
+
+            # Guardar nuevo usuario en la base de datos
+            cursor.execute("INSERT INTO users (username, password) VALUES (%s, %s)", (username, hashed_password))
+            db.commit()
+            cursor.close()
+
+            flash('Usuario registrado exitosamente.', 'success')
+            return redirect(url_for('login'))
+        except mysql.connector.Error as err:
+            print(f"Error al registrar el usuario: {err}")
+            flash('Error en la base de datos.', 'danger')
             return redirect(url_for('registro'))
-        
-        # Guardar usuario en la base de datos
-        new_user = User(username=username, password=hashed_password)
-        db.session.add(new_user)
-        db.session.commit()
-        flash('Usuario registrado exitosamente.', 'success')
-        return redirect(url_for('login'))
+
     return render_template('registro.html')
+
+# Resto de tu aplicación...
 
 
 @app.route('/logout')
@@ -535,6 +551,7 @@ def matriculas():
         print(f"Error al cargar datos: {err}")
         return "Error al cargar datos para matrícula"
 
+
 # Ruta para registrar una nueva matrícula
 @app.route('/registrar_matricula', methods=['POST'])
 def registrar_matricula():
@@ -545,6 +562,7 @@ def registrar_matricula():
         if not idalumno or not idasignatura:
             return "Debe seleccionar un alumno y una asignatura"
 
+        # Usar mysql.connector para insertar la matrícula
         cursor = db.cursor()
         consulta = "INSERT INTO matricula (idalumno, idasignatura) VALUES (%s, %s)"
         cursor.execute(consulta, (idalumno, idasignatura))
@@ -557,13 +575,15 @@ def registrar_matricula():
         print(f"Error al registrar matrícula: {err}")
         return f"Error al registrar matrícula: {err}"
 
+
 # Ruta para listar matrículas
 @app.route('/reporte_matriculas')
 @login_required
 def reporte_matriculas():
     try:
         cursor = db.cursor(dictionary=True)
-        cursor.execute("""
+
+        consulta = """
             SELECT m.idmatricula, 
                    a.nombre AS alumno_nombre, 
                    a.apellidos AS alumno_apellidos,
@@ -571,16 +591,16 @@ def reporte_matriculas():
             FROM matricula m
             JOIN alumnos a ON m.idalumno = a.idalumno
             JOIN asignatura asig ON m.idasignatura = asig.idasignatura
-        """)
+        """
+        cursor.execute(consulta)
         matriculas = cursor.fetchall()
         cursor.close()
 
         return render_template('reportematricula.html', matriculas=matriculas)
     except mysql.connector.Error as err:
         print(f"Error al consultar matrículas: {err}")
-        return "Error al consultar matrículas"
-
-# Ruta para eliminar matrícula
+        return f"Error al consultar matrículas: {err}"
+    # Ruta para eliminar matrícula
 @app.route('/eliminar_matricula/<int:idmatricula>', methods=['POST'])
 def eliminar_matricula(idmatricula):
     try:
