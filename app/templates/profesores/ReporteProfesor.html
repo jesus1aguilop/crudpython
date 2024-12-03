@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Reporte de Profesores{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center mb-4">Reporte de Profesores</h1>
+    <table class="table table-bordered table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>ID Profesor</th>
+                <th>NIF</th>
+                <th>Nombre</th>
+                <th>Apellidos</th>
+                <th>Teléfono</th>
+                <th>Dirección Postal</th>
+                <th>Email</th>
+                <th>Categoría</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if profesores %}
+
+
+
+            
+                {% for profesor in profesores %}
+                <tr>
+                    <td>{{ profesor.idprofesor }}</td>
+                    <td>{{ profesor.nif }}</td>
+                    <td>{{ profesor.nombre }}</td>
+                    <td>{{ profesor.apellidos }}</td>
+                    <td>{{ profesor.telefono }}</td>
+                    <td>{{ profesor.direccion_postal }}</td>
+                    <td>{{ profesor.direccion_electronica }}</td>
+                    <td>{{ profesor.categoria }}</td>
+                    <td>
+                        <a href="{{ url_for('editar_profesor', idprofesor=profesor.idprofesor) }}" class="btn btn-warning btn-sm">Editar</a>
+                        <form action="{{ url_for('eliminar_profesor', idprofesor=profesor.idprofesor) }}" method="post" style="display:inline;">
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que quieres eliminar este profesor?')">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="9" class="text-center">No hay profesores registrados.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

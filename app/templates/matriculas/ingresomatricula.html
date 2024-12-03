@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Registrar Matrícula</h2>
+    <form action="{{ url_for('registrar_matricula') }}" method="POST" class="row g-3">
+        <!-- Selección de Alumno -->
+        <div class="col-md-6">
+            <label for="idalumno" class="form-label">Alumno</label>
+            <select name="idalumno" id="idalumno" class="form-select" required>
+                <option value="">Seleccionar Alumno</option>
+                {% for alumno in alumnos %}
+                    <option value="{{ alumno.idalumno }}">{{ alumno.nombre }} {{ alumno.apellidos }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Selección de Asignatura -->
+        <div class="col-md-6">
+            <label for="idasignatura" class="form-label">Asignatura</label>
+            <select name="idasignatura" id="idasignatura" class="form-select" required>
+                <option value="">Seleccionar Asignatura</option>
+                {% for asignatura in asignaturas %}
+                    <option value="{{ asignatura.idasignatura }}">{{ asignatura.nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Botón de Enviar -->
+        <div class="col-12 text-center">
+            <button type="submit" class="btn btn-primary">Registrar Matrícula</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
