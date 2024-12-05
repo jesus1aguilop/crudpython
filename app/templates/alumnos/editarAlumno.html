@@ -5,7 +5,7 @@
 {% block content %}
 <div class="container my-5">
     <h2>Editar Alumno</h2>
-    <form action="{{ url_for('editar_alumno', idalumno=alumno.idalumno) }}" method="post">
+    <form action="{{ url_for('alumno.editar_alumno', idalumno=alumno.idalumno) }}" method="post">
         <div class="mb-3">
             <label for="nombre" class="form-label">Nombre</label>
             <input type="text" class="form-control" id="nombre" name="nombre" value="{{ alumno.nombre }}">
@@ -27,7 +27,7 @@
             <label class="form-check-label" for="tiene_beca">Tiene Beca</label>
         </div>
         <button type="submit" class="btn btn-primary">Guardar cambios</button>
-        <a href="{{ url_for('reporte') }}" class="btn btn-secondary">Cancelar</a>
+        <a href="{{ url_for('user.reporte') }}" class="btn btn-secondary">Cancelar</a>
     </form>
 </div>
 {% endblock %}

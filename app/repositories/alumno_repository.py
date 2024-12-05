@@ -1,4 +1,4 @@
-from app import db
+from app.extensions import db_connection as db
 from app.models.alumno import Alumno
 
 class AlumnoRepository:

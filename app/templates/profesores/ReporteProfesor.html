@@ -36,8 +36,8 @@
                     <td>{{ profesor.direccion_electronica }}</td>
                     <td>{{ profesor.categoria }}</td>
                     <td>
-                        <a href="{{ url_for('editar_profesor', idprofesor=profesor.idprofesor) }}" class="btn btn-warning btn-sm">Editar</a>
-                        <form action="{{ url_for('eliminar_profesor', idprofesor=profesor.idprofesor) }}" method="post" style="display:inline;">
+                        <a href="{{ url_for('profesor.editar_profesor', idprofesor=profesor.idprofesor) }}" class="btn btn-warning btn-sm">Editar</a>
+                        <form action="{{ url_for('profesor.eliminar_profesor', idprofesor=profesor.idprofesor) }}" method="post" style="display:inline;">
                             <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que quieres eliminar este profesor?')">Eliminar</button>
                         </form>
                     </td>

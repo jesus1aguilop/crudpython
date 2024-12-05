@@ -33,7 +33,7 @@
         Sistema Educativo
     </a>
 
-    <a href="{{ url_for('index') }}"><i class="fas fa-home"></i> Dashboard</a>
+    <a href="{{ url_for('user.index') }}"><i class="fas fa-home"></i> Dashboard</a>
 
     <!-- Ingresos Dropdown -->
     <div class="dropdown">
@@ -41,11 +41,11 @@
             <i class="fas fa-file-import"></i> Ingresos
         </a>
         <ul class="dropdown-menu w-100">
-            <li><a class="dropdown-item" href="{{ url_for('formulario') }}"><i class="fas fa-user-graduate"></i> Ingreso Alumno</a></li>
-            <li><a class="dropdown-item" href="{{ url_for('formulario1') }}"><i class="fas fa-chalkboard-teacher"></i> Ingreso Profesor</a></li>
-            <li><a class="dropdown-item" href="{{ url_for('formulario2') }}"><i class="fas fa-book"></i> Ingreso Curso</a></li>
-            <li><a class="dropdown-item" href="{{ url_for('formulario3') }}"><i class="fas fa-book-open"></i> Ingreso Asignatura</a></li>
-            <li><a class="dropdown-item" href="{{ url_for('matriculas') }}"><i class="fas fa-user-plus"></i> Ingreso Matrícula</a></li>  <!-- Enlace a Ingreso Matrícula -->
+            <li><a class="dropdown-item" href="{{ url_for('alumno.formulario') }}"><i class="fas fa-user-graduate"></i> Ingreso Alumno</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('profesor.formulario1') }}"><i class="fas fa-chalkboard-teacher"></i> Ingreso Profesor</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('curso.formulario2') }}"><i class="fas fa-book"></i> Ingreso Curso</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('asignatura.formulario3') }}"><i class="fas fa-book-open"></i> Ingreso Asignatura</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('matricula.matriculas') }}"><i class="fas fa-user-plus"></i> Ingreso Matrícula</a></li>  <!-- Enlace a Ingreso Matrícula -->
         </ul>
     </div>
 
@@ -55,15 +55,15 @@
             <i class="fas fa-chart-bar"></i> Reportes
         </a>
         <ul class="dropdown-menu w-100">
-            <li><a class="dropdown-item" href="{{ url_for('reporte') }}"><i class="fas fa-user-graduate"></i> Reporte de Alumno</a></li>
-            <li><a class="dropdown-item" href="{{ url_for('reporteProfesor') }}"><i class="fas fa-chalkboard-teacher"></i> Reporte de Profesor</a></li>
-            <li><a class="dropdown-item" href="{{ url_for('reporteCurso') }}"><i class="fas fa-book"></i> Reporte de Curso</a></li>
-            <li><a class="dropdown-item" href="{{ url_for('reporteAsignatura') }}"><i class="fas fa-book-open"></i> Reporte de Asignatura</a></li>
-            <li><a class="dropdown-item" href="{{ url_for('reporte_matriculas') }}"><i class="fas fa-file-alt"></i> Reporte de Matrícula</a></li>  <!-- Enlace a Reporte Matrícula -->
+            <li><a class="dropdown-item" href="{{ url_for('alumno.reporte') }}"><i class="fas fa-user-graduate"></i> Reporte de Alumno</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('profesor.reporteProfesor') }}"><i class="fas fa-chalkboard-teacher"></i> Reporte de Profesor</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('curso.reporteCurso') }}"><i class="fas fa-book"></i> Reporte de Curso</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('asignatura.reporteAsignatura') }}"><i class="fas fa-book-open"></i> Reporte de Asignatura</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('matricula.reporte_matriculas') }}"><i class="fas fa-file-alt"></i> Reporte de Matrícula</a></li>  <!-- Enlace a Reporte Matrícula -->
         </ul>
     </div>
     <!-- Botón Logout -->
-<a href="{{ url_for('logout') }}" class="btn btn-danger w-100 mt-3"><i class="fas fa-sign-out-alt"></i> Logout</a>
+<a href="{{ url_for('user.logout') }}" class="btn btn-danger w-100 mt-3"><i class="fas fa-sign-out-alt"></i> Logout</a>
 </div>
     <!-- Main content -->
     <div class="main-content">

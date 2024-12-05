@@ -1,15 +1,14 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from app import app
 from app.repositories.curso_repository import CursoRepository
-from flask_login import login_required
+from app.utils import login_required
 
-curso_bp = Blueprint('curso', __name__)
+curso_bp = Blueprint('curso', __name__, template_folder='../templates/cursos')
 
 # Ruta para mostrar el formulario de creación de curso
-curso_bp.route('/formulario2')
+@curso_bp.route('/formulario2')
 @login_required
 def formulario2():
-    return render_template('/cursos/IngresoCurso.html')
+    return render_template('IngresoCurso.html')
 
 # Ruta que recibe los datos del formulario de Curso
 @curso_bp.route('/submit_form2', methods=['POST'])

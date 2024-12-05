@@ -20,11 +20,11 @@
                 <td>{{ matricula.asignatura_nombre }}</td>
                 <td>
                     <!-- Botón de Eliminar -->
-                    <form action="{{ url_for('eliminar_matricula', idmatricula=matricula.idmatricula) }}" method="POST" style="display:inline;">
+                    <form action="{{ url_for('matricula.eliminar_matricula', idmatricula=matricula.idmatricula) }}" method="POST" style="display:inline;">
                         <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
                     </form>
                     <!-- Botón de Editar -->
-                    <a href="{{ url_for('editar_matricula', idmatricula=matricula.idmatricula) }}" class="btn btn-primary btn-sm">Editar</a>
+                    <a href="{{ url_for('matriculas.editar_matricula', idmatricula=matricula.idmatricula) }}" class="btn btn-primary btn-sm">Editar</a>
                 </td>
             </tr>
             {% endfor %}

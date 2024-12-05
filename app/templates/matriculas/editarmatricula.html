@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container mt-5">
     <h2 class="text-center mb-4">Editar Matrícula</h2>
-    <form action="{{ url_for('editar_matricula', idmatricula=matricula.idmatricula) }}" method="POST" class="needs-validation" novalidate>
+    <form action="{{ url_for('matricula.editar_matricula', idmatricula=matricula.idmatricula) }}" method="POST" class="needs-validation" novalidate>
         <!-- Selección de Alumno -->
         <div class="mb-3">
             <label for="idalumno" class="form-label">Alumno</label>

@@ -1,18 +1,17 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from app import app
 from app.repositories.profesor_repository import ProfesorRepository
 from flask_login import login_required
 
-profesor_bp = Blueprint('profesor', __name__)
+profesor_bp = Blueprint('profesor', __name__, template_folder='../templates/profesores')
 
 # Ruta para mostrar el formulario de creación de profesor
-profesor_bp.route('/formulario1')
+@profesor_bp.route('/formulario1')
 @login_required
 def formulario1():
     return render_template('IngresoProfesor.html')
 
 # Ruta que recibe los datos del formulario de Profesor
-profesor_bp.route('/submit_form1', methods=['POST'])
+@profesor_bp.route('/submit_form1', methods=['POST'])
 def submit_form1():
     nif = request.form.get('nif')
     nombre = request.form.get('nombre')
@@ -29,30 +28,30 @@ def submit_form1():
 
     if profesor:
         flash('Profesor creado con éxito', 'success')
-        return redirect(url_for('formulario1'))
+        return redirect(url_for('profesor.formulario1'))
     else:
         flash('Error al crear el profesor', 'error')
-        return redirect(url_for('formulario1'))
+        return redirect(url_for('profesor.formulario1'))
 
 # Ruta para mostrar los registros de los profesores
-profesor_bp.route('/reporteProfesor')
+@profesor_bp.route('/reporteProfesor')
 @login_required
 def reporteProfesor():
     profesores = ProfesorRepository.get_all_profesores()
     return render_template('reporteProfesor.html', profesores=profesores)
 
 # Ruta para eliminar un profesor
-profesor_bp.route('/eliminar_profesor/<int:idprofesor>', methods=["POST"])
+@profesor_bp.route('/eliminar_profesor/<int:idprofesor>', methods=["POST"])
 def eliminar_profesor(idprofesor):
     success = ProfesorRepository.delete_profesor(idprofesor)
     if success:
         flash('Profesor eliminado con éxito', 'success')
     else:
         flash('Error al eliminar el profesor', 'error')
-    return redirect(url_for('reporteProfesor'))
+    return redirect(url_for('profesor.reporteProfesor'))
 
 # Ruta para editar un profesor
-profesor_bp.route('/editar_profesor/<int:idprofesor>', methods=['GET', 'POST'])
+@profesor_bp.route('/editar_profesor/<int:idprofesor>', methods=['GET', 'POST'])
 @login_required
 def editar_profesor(idprofesor):
     if request.method == 'POST':
@@ -71,15 +70,15 @@ def editar_profesor(idprofesor):
 
         if profesor:
             flash('Profesor actualizado con éxito', 'success')
-            return redirect(url_for('reporteProfesor'))
+            return redirect(url_for('profesor.reporteProfesor'))
         else:
             flash('Error al actualizar el profesor', 'error')
-            return redirect(url_for('editar_profesor', idprofesor=idprofesor))
+            return redirect(url_for('profesor.editar_profesor', idprofesor=idprofesor))
 
     else:
         # Obtener el profesor a editar
         profesor = ProfesorRepository.get_profesor_by_id(idprofesor)
         if not profesor:
             flash('Profesor no encontrado', 'error')
-            return redirect(url_for('reporteProfesor'))
+            return redirect(url_for('profesor.reporteProfesor'))
         return render_template('editarProfesor.html', profesor=profesor)

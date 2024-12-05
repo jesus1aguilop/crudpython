@@ -30,10 +30,10 @@
                     <td>{{ 'Sí' if alumno.tiene_beca else 'No' }}</td>
                     <td>
                         <!-- Botón Editar -->
-                        <a href="{{ url_for('editar_alumno', idalumno=alumno.idalumno) }}" class="btn btn-warning btn-sm">Editar</a>
+                        <a href="{{ url_for('alumno.editar_alumno', idalumno=alumno.idalumno) }}" class="btn btn-warning btn-sm">Editar</a>
                         
                         <!-- Botón Eliminar -->
-                        <form action="{{ url_for('eliminar_alumno', idalumno=alumno.idalumno) }}" method="post" style="display:inline;">
+                        <form action="{{ url_for('alumno.eliminar_alumno', idalumno=alumno.idalumno) }}" method="post" style="display:inline;">
                             <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar este alumno?')">Eliminar</button>
                         </form>
                     </td>

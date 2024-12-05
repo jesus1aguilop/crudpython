@@ -1,68 +1,69 @@
-from app import db
-from app.models import Asignatura
+from app.extensions import db_connection as db
+from app.models.asignatura import Asignatura
 
 class AsignaturaRepository:
-
     @staticmethod
     def create_asignatura(nombre, creditos, cuatrimestre, caracter):
+        sql = """
+        INSERT INTO asignatura (nombre, creditos, cuatrimestre, caracter)
+        VALUES (%s, %s, %s, %s)
+        """
+        valores = (nombre, creditos, cuatrimestre, caracter)
+        cursor = db.cursor()
         try:
-            nueva_asignatura = Asignatura(
-                nombre=nombre,
-                creditos=creditos,
-                cuatrimestre=cuatrimestre,
-                caracter=caracter
-            )
-            db.session.add(nueva_asignatura)
-            db.session.commit()
-            return nueva_asignatura
-        except Exception as e:
-            db.session.rollback()
-            print(f"Error al crear asignatura: {e}")
-            return None
+            cursor.execute(sql, valores)
+            db.commit()
+            return cursor.lastrowid
+        except Exception as err:
+            db.rollback()
+            raise err
+        finally:
+            cursor.close()
 
     @staticmethod
     def get_all_asignaturas():
+        cursor = db.cursor(dictionary=True)
         try:
-            return Asignatura.query.all()
-        except Exception as e:
-            print(f"Error al obtener las asignaturas: {e}")
-            return []
+            cursor.execute("SELECT * FROM asignatura")
+            return cursor.fetchall()
+        finally:
+            cursor.close()
 
     @staticmethod
     def get_asignatura_by_id(idasignatura):
+        cursor = db.cursor(dictionary=True)
         try:
-            return Asignatura.query.get(idasignatura)
-        except Exception as e:
-            print(f"Error al obtener asignatura por ID: {e}")
-            return None
+            cursor.execute("SELECT * FROM asignatura WHERE idasignatura = %s", (idasignatura,))
+            return cursor.fetchone()
+        finally:
+            cursor.close()
 
     @staticmethod
     def update_asignatura(idasignatura, nombre, creditos, cuatrimestre, caracter):
+        sql = """
+        UPDATE asignatura
+        SET nombre = %s, creditos = %s, cuatrimestre = %s, caracter = %s
+        WHERE idasignatura = %s
+        """
+        valores = (nombre, creditos, cuatrimestre, caracter, idasignatura)
+        cursor = db.cursor()
         try:
-            asignatura = Asignatura.query.get(idasignatura)
-            if asignatura:
-                asignatura.nombre = nombre
-                asignatura.creditos = creditos
-                asignatura.cuatrimestre = cuatrimestre
-                asignatura.caracter = caracter
-                db.session.commit()
-                return asignatura
-            return None
-        except Exception as e:
-            db.session.rollback()
-            print(f"Error al actualizar la asignatura: {e}")
-            return None
+            cursor.execute(sql, valores)
+            db.commit()
+        except Exception as err:
+            db.rollback()
+            raise err
+        finally:
+            cursor.close()
 
     @staticmethod
     def delete_asignatura(idasignatura):
+        cursor = db.cursor()
         try:
-            asignatura = Asignatura.query.get(idasignatura)
-            if asignatura:
-                db.session.delete(asignatura)
-                db.session.commit()
-                return True
-            return False
-        except Exception as e:
-            db.session.rollback()
-            print(f"Error al eliminar la asignatura: {e}")
-            return False
+            cursor.execute("DELETE FROM asignatura WHERE idasignatura = %s", (idasignatura,))
+            db.commit()
+        except Exception as err:
+            db.rollback()
+            raise err
+        finally:
+            cursor.close()

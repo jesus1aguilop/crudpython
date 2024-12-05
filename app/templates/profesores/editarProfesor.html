@@ -35,7 +35,7 @@
             <input type="text" class="form-control" id="categoria" name="categoria" maxlength="45" value="{{ profesor.categoria }}" required>
         </div>
         <button type="submit" class="btn btn-primary">Guardar cambios</button>
-        <a href="{{ url_for('reporteProfesor') }}" class="btn btn-secondary">Cancelar</a>
+        <a href="{{ url_for('profesor.reporteProfesor') }}" class="btn btn-secondary">Cancelar</a>
     </form>
 </div>
 {% endblock %}

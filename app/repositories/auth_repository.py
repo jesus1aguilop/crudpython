@@ -1,39 +1,35 @@
-import mysql.connector
-from werkzeug.security import check_password_hash, generate_password_hash
-from app import db
+from app.extensions import db_connection
+from app.models.auth import Auth 
 
 class AuthRepository:
     @staticmethod
-    def get_user_by_username(username):
-        try:
-            cursor = db.cursor(dictionary=True)
-            cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
-            user = cursor.fetchone()
-            cursor.close()
-            return user
-        except mysql.connector.Error as err:
-            print(f"Error al consultar el usuario: {err}")
-            return None
+    def get_by_username(username):
+        """Obtiene un usuario por su username."""
+        connection = db_connection.get_connection()
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
+        user_data = cursor.fetchone()
+        cursor.close()
+        return Auth.from_dict(user_data) if user_data else None
 
     @staticmethod
-    def create_user(username, password):
-        try:
-            cursor = db.cursor()
-            hashed_password = generate_password_hash(password)
+    def create_user(username, hashed_password):
+        """Crea un nuevo usuario en la base de datos."""
+        connection = db_connection.get_connection()
+        cursor = connection.cursor()
+        cursor.execute(
+            "INSERT INTO users (username, password) VALUES (%s, %s)",
+            (username, hashed_password),
+        )
+        connection.commit()
+        cursor.close()
 
-            # Verificar si el usuario ya existe
-            cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
-            existing_user = cursor.fetchone()
-            if existing_user:
-                cursor.close()
-                return None
-
-            # Insertar el nuevo usuario
-            cursor.execute("INSERT INTO users (username, password) VALUES (%s, %s)", (username, hashed_password))
-            db.commit()
-            cursor.close()
-
-            return True
-        except mysql.connector.Error as err:
-            print(f"Error al registrar el usuario: {err}")
-            return False
+    @staticmethod
+    def user_exists(username):
+        """Verifica si un usuario ya existe en la base de datos."""
+        connection = db_connection.get_connection()
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
+        exists = cursor.fetchone() is not None
+        cursor.close()
+        return exists

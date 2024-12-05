@@ -1,64 +1,83 @@
-from app import db
-from app.models import Matricula
+from app.extensions import db_connection as db
+import mysql.connector
 
 class MatriculaRepository:
     
     @staticmethod
     def create_matricula(idalumno, idasignatura):
+        sql = """
+        INSERT INTO matricula (idalumno, idasignatura)
+        VALUES (%s, %s)
+        """
+        valores = (idalumno, idasignatura)
+        cursor = db.cursor()
+
         try:
-            nueva_matricula = Matricula(
-                idalumno=idalumno, 
-                idasignatura=idasignatura
-            )
-            db.session.add(nueva_matricula)
-            db.session.commit()
-            return nueva_matricula
-        except Exception as e:
-            db.session.rollback()
-            print(f"Error al crear matricula: {e}")
-            return None
-        
-    @staticmethod
-    def get_all_matriculas():
-            try:
-                return Matricula.query.all()
-            except Exception as e:
-                print(f"Error al obtener las matriculas: {e}")
-                return []
+            # Ejecutar el comando SQL e insertar datos
+            cursor.execute(sql, valores)
+            db.commit()  # Confirmar cambios en la base de datos
+        except mysql.connector.Error as err:
+            db.rollback()  # Revertir cambios en caso de error
+            return f"Error al guardar los datos: {err}"
+        finally:
+            cursor.close()  # Cerrar el cursor luego de la operación
             
     @staticmethod
-    def get_matricula_by_id(idmatricula):
-            try:
-                return Matricula.query.get(idmatricula)
-            except Exception as e:
-                print(f"Error al obtener matricula por ID: {e}")
-                return None
-    
-    @staticmethod
-    def update_matricula(idmatricula, idalumno, idasignatura):
+    def get_all_alumnos():
+        cursor = db.cursor(dictionary=True)
         try:
-            matricula = Matricula.query.get(idmatricula)
-            if matricula:
-                matricula.idalumno = idalumno
-                matricula.idasignatura = idasignatura
-                db.session.commit()
-                return matricula
-            return None
-        except Exception as e:
-            db.session.rollback()
-            print(f"Error al actualizar la matricula: {e}")
-            return None
-        
+            cursor.execute("SELECT * FROM alumnos")
+            return cursor.fetchall()
+        finally:
+            cursor.close()
+            
     @staticmethod
-    def delete_matricula(idmatricula):
+    def get_all_asignaturas():
+        cursor = db.cursor(dictionary=True)
         try:
-            matricula = Matricula.query.get(idmatricula)
-            if matricula:
-                db.session.delete(matricula)
-                db.session.commit()
-                return True
-            return False
-        except Exception as e:
-            db.session.rollback()
-            print(f"Error al eliminar la matricula: {e}")
-            return False
+            cursor.execute("SELECT * FROM asignatura")
+            return cursor.fetchall()
+        finally:
+            cursor.close()
+            
+    @staticmethod
+    def get_all_matriculas():
+        cursor = db.cursor(dictionary=True)
+        try:
+            cursor.execute("SELECT * FROM matricula")
+            return cursor.fetchall()
+        finally:
+            cursor.close()
+            
+    @staticmethod
+    def get_matricula_by_id(idalumno, idasignatura):
+        cursor = db.cursor(dictionary=True)
+        try:
+            cursor.execute("SELECT * FROM matricula WHERE idalumno = %s AND idasignatura = %s", (idalumno, idasignatura))
+            return cursor.fetchone()
+        finally:
+            cursor.close()
+            
+    @staticmethod
+    def delete_matricula(idalumno, idasignatura):
+        cursor = db.cursor()
+        try:
+            cursor.execute("DELETE FROM matricula WHERE idalumno = %s AND idasignatura = %s", (idalumno, idasignatura))
+            db.commit()
+        except Exception as err:
+            db.rollback()
+            return f"Error al guardar los datos: {err}"
+        finally:
+            cursor.close()
+            
+    @staticmethod
+    def update_matricula(idalumno, idasignatura):
+        cursor = db.cursor()
+        try:
+            cursor.execute("UPDATE matricula SET idalumno = %s, idasignatura = %s WHERE idalumno = %s AND idasignatura = %s", (idalumno, idasignatura, idalumno, idasignatura))
+            db.commit()
+        except Exception as err:
+            db.rollback()
+            return f"Error al guardar los datos: {err}"
+        finally:
+            cursor.close()
