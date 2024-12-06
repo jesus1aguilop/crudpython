@@ -8,9 +8,7 @@ class Config:
     DB_PASSWORD = os.environ.get('DB_PASSWORD', '')
     DB_DATABASE = os.environ.get('DB_DATABASE', 'universidad_2')
 
-    # Otras configuraciones
-    SESSION_TYPE = 'filesystem'  # Almacena sesiones en el sistema de archivos
-    SESSION_PERMANENT = False  # No hace que las sesiones sean permanentes
-    SECRET_KEY = 'your_secret_key' # Clave para firmar las cookies y las sesionesandom(24)  # Clave para firmar las sesiones
-    
-    
+    # Configuración de sesión
+    SESSION_TYPE = 'filesystem'
+    SESSION_PERMANENT = False
+    SECRET_KEY = 'mi-clave-secreta-unica' 

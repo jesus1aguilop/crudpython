@@ -9,20 +9,29 @@ class AlumnoRepository:
         VALUES (%s, %s, %s, %s, %s)
         """
         valores = (nombre, apellidos, direccion_postal, direccion_electronica, tiene_beca)
-        cursor = db.cursor()
+
+        connection = db.get_connection()  # Obtener la conexión
+        if not connection:
+            return "Error: No se pudo conectar a la base de datos"
+
         try:
+            cursor = connection.cursor()
             cursor.execute(sql, valores)
-            db.commit()
+            connection.commit()  # Confirmar cambios en la base de datos
         except Exception as err:
-            db.rollback()
+            connection.rollback()  # Revertir cambios en caso de error
             raise err
         finally:
-            cursor.close()
+            cursor.close()  # Cerrar el cursor luego de la operación
 
     @staticmethod
     def obtener_todos_los_alumnos():
-        cursor = db.cursor(dictionary=True)
+        connection = db.get_connection()
+        if not connection:
+            return []
+
         try:
+            cursor = connection.cursor(dictionary=True)
             cursor.execute("SELECT * FROM alumnos")
             return cursor.fetchall()
         finally:
@@ -30,8 +39,12 @@ class AlumnoRepository:
 
     @staticmethod
     def obtener_alumno_por_id(idalumno):
-        cursor = db.cursor(dictionary=True)
+        connection = db.get_connection()
+        if not connection:
+            return None
+
         try:
+            cursor = connection.cursor(dictionary=True)
             cursor.execute("SELECT * FROM alumnos WHERE idalumno = %s", (idalumno,))
             return cursor.fetchone()
         finally:
@@ -45,24 +58,33 @@ class AlumnoRepository:
         WHERE idalumno = %s
         """
         valores = (nombre, apellidos, direccion_postal, direccion_electronica, tiene_beca, idalumno)
-        cursor = db.cursor()
+
+        connection = db.get_connection()  # Obtener la conexión
+        if not connection:
+            return "Error: No se pudo conectar a la base de datos"
+
         try:
+            cursor = connection.cursor()
             cursor.execute(sql, valores)
-            db.commit()
+            connection.commit()  # Confirmar cambios en la base de datos
         except Exception as err:
-            db.rollback()
+            connection.rollback()  # Revertir cambios en caso de error
             raise err
         finally:
             cursor.close()
 
     @staticmethod
     def eliminar_alumno(idalumno):
-        cursor = db.cursor()
+        connection = db.get_connection()
+        if not connection:
+            return "Error: No se pudo conectar a la base de datos"
+
         try:
+            cursor = connection.cursor()
             cursor.execute("DELETE FROM alumnos WHERE idalumno = %s", (idalumno,))
-            db.commit()
+            connection.commit()  # Confirmar eliminación en la base de datos
         except Exception as err:
-            db.rollback()
+            connection.rollback()  # Revertir cambios en caso de error
             raise err
         finally:
             cursor.close()

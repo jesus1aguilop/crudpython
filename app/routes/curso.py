@@ -20,10 +20,10 @@ def submit_form2():
     curso = CursoRepository.create_curso(nombre, numero_asignaturas)
 
     if curso:
-        flash('Curso creado con éxito', 'success')
+        print('Curso creado con éxito', 'success')
         return redirect(url_for('curso.formulario2'))
     else:
-        flash('Error al crear el curso', 'error')
+        print('Error al crear el curso', 'error')
         return redirect(url_for('curso.formulario2'))
 
 # Ruta para mostrar los registros de los cursos
@@ -38,9 +38,9 @@ def reporteCurso():
 def eliminar_curso(idcurso):
     success = CursoRepository.delete_curso(idcurso)
     if success:
-        flash('Curso eliminado con éxito', 'success')
+        print('Curso eliminado con éxito', 'success')
     else:
-        flash('Error al eliminar el curso', 'error')
+        print('Error al eliminar el curso', 'error')
     return redirect(url_for('curso.reporteCurso'))
 
 # Ruta para editar un curso
@@ -55,16 +55,16 @@ def editar_curso(idcurso):
         curso = CursoRepository.update_curso(idcurso, nombre, numero_asignaturas)
 
         if curso:
-            flash('Curso actualizado con éxito', 'success')
+            print('Curso actualizado con éxito', 'success')
             return redirect(url_for('curso.reporteCurso'))
         else:
-            flash('Error al actualizar el curso', 'error')
+            print('Error al actualizar el curso', 'error')
             return redirect(url_for('curso.editar_curso', idcurso=idcurso))
 
     else:
         # Obtener el curso a editar
         curso = CursoRepository.get_curso_by_id(idcurso)
         if not curso:
-            flash('Curso no encontrado', 'error')
+            print('Curso no encontrado', 'error')
             return redirect(url_for('curso.reporteCurso'))
         return render_template('editarCurso.html', curso=curso)

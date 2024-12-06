@@ -7,12 +7,13 @@ from app.routes.matricula import matricula_bp
 from app.routes.auth import auth_bp
 from app.extensions import db_connection
 from app.extensions import session
+from app.config import Config
 
 def create_app():
     app = Flask(__name__)
 
     # Configuracion de la aplicacion
-    app.config.from_pyfile('config.py')
+    app.config.from_object(Config)
     
     # Conectar a la base de datos
     db_connection.get_connection()

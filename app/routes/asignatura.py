@@ -22,10 +22,10 @@ def submit_form3():
     asignatura = AsignaturaRepository.create_asignatura(nombre, creditos, cuatrimestre, caracter)
 
     if asignatura:
-        flash('Asignatura creada con éxito', 'success')
+        print('Asignatura creada con éxito', 'success')
         return redirect(url_for('asignatura.formulario3'))
     else:
-        flash('Error al crear la asignatura', 'error')
+        print('Error al crear la asignatura', 'error')
         return redirect(url_for('asignatura.formulario3'))
 
 # Ruta para mostrar los registros de las asignaturas
@@ -40,9 +40,9 @@ def reporteAsignatura():
 def eliminar_asignatura(idasignatura):
     success = AsignaturaRepository.delete_asignatura(idasignatura)
     if success:
-        flash('Asignatura eliminada con éxito', 'success')
+        print('Asignatura eliminada con éxito', 'success')
     else:
-        flash('Error al eliminar la asignatura', 'error')
+        print('Error al eliminar la asignatura', 'error')
     return redirect(url_for('asignatura.reporteAsignatura'))
 
 # Ruta para editar una asignatura
@@ -60,16 +60,16 @@ def editar_asignatura(idasignatura):
         asignatura = AsignaturaRepository.update_asignatura(idasignatura, nombre, creditos, cuatrimestre, caracter)
 
         if asignatura:
-            flash('Asignatura actualizada con éxito', 'success')
+            print('Asignatura actualizada con éxito', 'success')
             return redirect(url_for('asignatura.reporteAsignatura'))
         else:
-            flash('Error al actualizar la asignatura', 'error')
+            print('Error al actualizar la asignatura', 'error')
             return redirect(url_for('asignatura.editar_asignatura', idasignatura=idasignatura))
 
     else:
         # Obtener los datos de la asignatura a editar
         asignatura = AsignaturaRepository.get_asignatura_by_id(idasignatura)
         if not asignatura:
-            flash('Asignatura no encontrada', 'error')
+            print('Asignatura no encontrada', 'error')
             return redirect(url_for('asignatura.reporteAsignatura'))
         return render_template('editarAsignatura.html', asignatura=asignatura)

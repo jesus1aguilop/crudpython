@@ -2,12 +2,12 @@ from flask import Blueprint, request, render_template, redirect, url_for, flash,
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.repositories.auth_repository import AuthRepository
 
-auth_bp = Blueprint('user', __name__, template_folder='../templates/auth')
+auth_bp = Blueprint('auth', __name__, template_folder='../templates/auth')
 
 @auth_bp.route('/')
 def index():
     if 'user_id' not in session:
-        return redirect(url_for('user.login'))  # Cambiado aquí
+        return redirect(url_for('auth.login'))  # Cambiado aquí
     return render_template('index.html')
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
@@ -21,11 +21,11 @@ def login():
         if user and check_password_hash(user.password, password):
             session['user_id'] = user.idusuario
             session['user_name'] = user.username
-            flash('Inicio de sesión exitoso.', 'success')
-            return redirect(url_for('user.index'))  # Cambiado aquí
+            print('Inicio de sesión exitoso.', 'success')
+            return redirect(url_for('auth.index'))  # Cambiado aquí
         else:
-            flash('Usuario o contraseña incorrectos.', 'danger')
-            return redirect(url_for('user.login'))  # Cambiado aquí
+            print('Usuario o contraseña incorrectos.', 'danger')
+            return redirect(url_for('auth.login'))  # Cambiado aquí
 
     return render_template('login.html')
 
@@ -37,13 +37,13 @@ def registro():
         password = request.form['password']
 
         if AuthRepository.user_exists(username):
-            flash('El usuario ya existe.', 'danger')
-            return redirect(url_for('user.registro'))  # Cambiado aquí
+            print('El usuario ya existe.', 'danger')
+            return redirect(url_for('auth.registro'))  # Cambiado aquí
 
         hashed_password = generate_password_hash(password)
         AuthRepository.create_user(username, hashed_password)
-        flash('Usuario registrado exitosamente.', 'success')
-        return redirect(url_for('user.login'))  # Cambiado aquí
+        print('Usuario registrado exitosamente.', 'success')
+        return redirect(url_for('auth.login'))  # Cambiado aquí
 
     return render_template('registro.html')
 
@@ -51,5 +51,5 @@ def registro():
 @auth_bp.route('/logout')
 def logout():
     session.clear()
-    flash('Sesión cerrada exitosamente.', 'success')
-    return redirect(url_for('user.login'))  # Cambiado aquí
+    print('Sesión cerrada exitosamente.', 'success')
+    return redirect(url_for('auth.login'))  # Cambiado aquí

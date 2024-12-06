@@ -6,7 +6,6 @@ profesor_bp = Blueprint('profesor', __name__, template_folder='../templates/prof
 
 # Ruta para mostrar el formulario de creación de profesor
 @profesor_bp.route('/formulario1')
-@login_required
 def formulario1():
     return render_template('IngresoProfesor.html')
 
@@ -27,15 +26,14 @@ def submit_form1():
     )
 
     if profesor:
-        flash('Profesor creado con éxito', 'success')
+        print('Profesor creado con éxito', 'success')
         return redirect(url_for('profesor.formulario1'))
     else:
-        flash('Error al crear el profesor', 'error')
+        print('Error al crear el profesor', 'error')
         return redirect(url_for('profesor.formulario1'))
 
 # Ruta para mostrar los registros de los profesores
 @profesor_bp.route('/reporteProfesor')
-@login_required
 def reporteProfesor():
     profesores = ProfesorRepository.get_all_profesores()
     return render_template('reporteProfesor.html', profesores=profesores)
@@ -45,14 +43,13 @@ def reporteProfesor():
 def eliminar_profesor(idprofesor):
     success = ProfesorRepository.delete_profesor(idprofesor)
     if success:
-        flash('Profesor eliminado con éxito', 'success')
+        print('Profesor eliminado con éxito', 'success')
     else:
-        flash('Error al eliminar el profesor', 'error')
+        print('Error al eliminar el profesor', 'error')
     return redirect(url_for('profesor.reporteProfesor'))
 
 # Ruta para editar un profesor
 @profesor_bp.route('/editar_profesor/<int:idprofesor>', methods=['GET', 'POST'])
-@login_required
 def editar_profesor(idprofesor):
     if request.method == 'POST':
         nif = request.form.get('nif')
@@ -69,16 +66,16 @@ def editar_profesor(idprofesor):
         )
 
         if profesor:
-            flash('Profesor actualizado con éxito', 'success')
+            print('Profesor actualizado con éxito', 'success')
             return redirect(url_for('profesor.reporteProfesor'))
         else:
-            flash('Error al actualizar el profesor', 'error')
+            print('Error al actualizar el profesor', 'error')
             return redirect(url_for('profesor.editar_profesor', idprofesor=idprofesor))
 
     else:
         # Obtener el profesor a editar
         profesor = ProfesorRepository.get_profesor_by_id(idprofesor)
         if not profesor:
-            flash('Profesor no encontrado', 'error')
+            print('Profesor no encontrado', 'error')
             return redirect(url_for('profesor.reporteProfesor'))
         return render_template('editarProfesor.html', profesor=profesor)

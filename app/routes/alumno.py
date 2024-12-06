@@ -8,7 +8,7 @@ alumno_bp = Blueprint('alumno', __name__, template_folder='../templates/alumnos'
 @alumno_bp.route('/formulario')
 @login_required
 def formulario():
-    return render_template(' IngresoAlumno.html')
+    return render_template('ingresoAlumno.html')
 
 # Ruta para recibir los datos del formulario y crear un alumno
 @alumno_bp.route('/submit_form', methods=['POST'])

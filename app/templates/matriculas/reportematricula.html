@@ -24,7 +24,7 @@
                         <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
                     </form>
                     <!-- Botón de Editar -->
-                    <a href="{{ url_for('matriculas.editar_matricula', idmatricula=matricula.idmatricula) }}" class="btn btn-primary btn-sm">Editar</a>
+                    <a href="{{ url_for('matricula.editar_matricula', idmatricula=matricula.idmatricula) }}" class="btn btn-primary btn-sm">Editar</a>
                 </td>
             </tr>
             {% endfor %}
